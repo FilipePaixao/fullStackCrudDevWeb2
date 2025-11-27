@@ -1,0 +1,115 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header" [@fadeInScale]>
+      <h1>{{ isLoginMode ? 'Bem-vindo' : 'Criar Conta' }}</h1>
+      <p>{{ isLoginMode ? 'Faça login para continuar' : 'Preencha os dados para criar sua conta' }}</p>
+    </div>
+
+    <div class="alert alert-error" *ngIf="errorMessage" [@fadeInOut]>
+      <span class="alert-icon">⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Formulário de Login -->
+    <form *ngIf="isLoginMode" (ngSubmit)="login()" class="login-form">
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input
+          type="email"
+          id="loginEmail"
+          [(ngModel)]="loginForm.email"
+          name="loginEmail"
+          placeholder="Digite seu email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Senha</label>
+        <input
+          type="password"
+          id="loginPassword"
+          [(ngModel)]="loginForm.password"
+          name="loginPassword"
+          placeholder="Digite sua senha"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <span *ngIf="!loading">Entrar</span>
+        <span *ngIf="loading" class="loading-content">
+          <span class="spinner-small"></span>
+          Carregando...
+        </span>
+      </button>
+    </form>
+
+    <!-- Formulário de Registro -->
+    <form *ngIf="!isLoginMode" (ngSubmit)="register()" class="login-form">
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="registerForm.name"
+          name="name"
+          placeholder="Digite seu nome"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="registerEmail">Email</label>
+        <input
+          type="email"
+          id="registerEmail"
+          [(ngModel)]="registerForm.email"
+          name="registerEmail"
+          placeholder="Digite seu email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="registerPassword">Senha</label>
+        <input
+          type="password"
+          id="registerPassword"
+          [(ngModel)]="registerForm.password"
+          name="registerPassword"
+          placeholder="Digite sua senha"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Senha</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          [(ngModel)]="registerForm.confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirme sua senha"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+        <span *ngIf="!loading">Criar Conta</span>
+        <span *ngIf="loading" class="loading-content">
+          <span class="spinner-small"></span>
+          Carregando...
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>
+        {{ isLoginMode ? 'Não tem uma conta?' : 'Já tem uma conta?' }}
+        <a (click)="toggleMode()" class="link">{{ isLoginMode ? 'Criar conta' : 'Fazer login' }}</a>
+      </p>
+    </div>
+  </div>
+</div>
+

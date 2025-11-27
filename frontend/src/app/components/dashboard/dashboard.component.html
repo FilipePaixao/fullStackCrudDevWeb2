@@ -1,0 +1,200 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div>
+        <h1>CRUD de Usuários</h1>
+        <p class="subtitle">Gerenciamento completo de usuários</p>
+      </div>
+      <div class="user-info">
+        <span class="user-name clickable" (click)="openProfileModal()" title="Ver meu perfil">
+          👤 {{ currentUserInfo?.name }}
+        </span>
+        <button class="btn btn-logout" (click)="logout()">
+          <span class="icon">🚪</span> Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <div class="alert alert-error" *ngIf="errorMessage" [@fadeInOut]>
+      <span class="alert-icon">⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+    <div class="alert alert-success" *ngIf="successMessage" [@fadeInOut]>
+      <span class="alert-icon">✓</span>
+      {{ successMessage }}
+    </div>
+
+    <div class="card card-header" [@slideDown]>
+      <div class="card-header-content">
+        <div>
+          <h2>Usuários Cadastrados</h2>
+          <p class="card-subtitle">{{ users.length }} usuário(s) no total</p>
+        </div>
+        <button class="btn btn-primary btn-icon ripple" (click)="openCreateModal()">
+          <span class="icon">+</span> Novo Usuário
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-container" *ngIf="loading" [@fadeInScale]>
+      <div class="spinner"></div>
+      <p>Carregando usuários...</p>
+    </div>
+
+    <div class="card" *ngIf="users.length > 0 && !loading; else noUsers" [@fadeInScale]>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th class="actions-column">Ações</th>
+            </tr>
+          </thead>
+          <tbody [@staggerSlideIn]="users">
+            <tr *ngFor="let user of users; let i = index" 
+                [@slideIn] 
+                class="table-row"
+                [class.deleting]="deletingUserId === user.id">
+              <td class="id-cell">{{ user.id }}</td>
+              <td class="name-cell">{{ user.name }}</td>
+              <td class="email-cell">{{ user.email }}</td>
+              <td class="actions-cell">
+                <button class="btn btn-icon btn-edit ripple" 
+                        (click)="openEditModal(user)" 
+                        title="Editar"
+                        [disabled]="deletingUserId === user.id">
+                  <span class="icon">✏️</span>
+                </button>
+                <button class="btn btn-icon btn-delete ripple" 
+                        (click)="deleteUser(user.id)" 
+                        title="Excluir"
+                        [disabled]="deletingUserId === user.id">
+                  <span class="icon" *ngIf="deletingUserId !== user.id">🗑️</span>
+                  <span class="spinner-small" *ngIf="deletingUserId === user.id"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <ng-template #noUsers>
+      <div class="card empty-state" *ngIf="!loading" [@bounceIn]>
+        <div class="empty-state-content">
+          <span class="empty-icon" [@rotateIn]>👥</span>
+          <h3>Nenhum usuário cadastrado</h3>
+          <p>Comece criando seu primeiro usuário</p>
+          <button class="btn btn-primary ripple" (click)="openCreateModal()">
+            + Criar Primeiro Usuário
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Modal de Criar/Editar Usuário -->
+<div class="modal" [class.show]="showModal" (click)="closeModal()" [@fadeInOut]>
+  <div class="modal-content" (click)="$event.stopPropagation()" [@slideUp]>
+    <div class="modal-header">
+      <h2 [@scaleIn]>{{ isEditing ? 'Editar Usuário' : 'Novo Usuário' }}</h2>
+      <button class="close ripple" (click)="closeModal()" [@rotateIn]>&times;</button>
+    </div>
+    
+    <form (ngSubmit)="saveUser()">
+      <div class="form-group" [@fadeInScale]>
+        <label for="name">Nome</label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="userForm.name"
+          name="name"
+          placeholder="Digite o nome"
+          required
+        />
+      </div>
+      
+      <div class="form-group" [@fadeInScale]>
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="userForm.email"
+          name="email"
+          placeholder="Digite o email"
+          required
+        />
+      </div>
+      
+      <div class="modal-footer" [@fadeInScale]>
+        <button type="button" class="btn btn-secondary ripple" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary ripple">
+          {{ isEditing ? 'Atualizar' : 'Criar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Perfil do Usuário -->
+<div class="modal" [class.show]="showProfileModal" (click)="closeProfileModal()" [@fadeInOut]>
+  <div class="modal-content profile-modal" (click)="$event.stopPropagation()" [@slideUp]>
+    <div class="modal-header">
+      <h2 [@scaleIn]>👤 Meu Perfil</h2>
+      <button class="close ripple" (click)="closeProfileModal()" [@rotateIn]>&times;</button>
+    </div>
+    
+    <div class="profile-content" *ngIf="!loadingProfile && currentUserProfile">
+      <div class="profile-avatar" [@bounceIn]>
+        <span class="avatar-icon">👤</span>
+      </div>
+      
+      <div class="profile-info" [@fadeInScale]>
+        <div class="info-item">
+          <span class="info-label">ID:</span>
+          <span class="info-value">{{ currentUserProfile.id }}</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">Nome:</span>
+          <span class="info-value">{{ currentUserProfile.name }}</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ currentUserProfile.email }}</span>
+        </div>
+        
+        <div class="info-item" *ngIf="currentUserProfile.createdAt">
+          <span class="info-label">Cadastrado em:</span>
+          <span class="info-value">{{ currentUserProfile.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        
+        <div class="info-item" *ngIf="currentUserProfile.updatedAt">
+          <span class="info-label">Última atualização:</span>
+          <span class="info-value">{{ currentUserProfile.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="loading-container" *ngIf="loadingProfile">
+      <div class="spinner"></div>
+      <p>Carregando perfil...</p>
+    </div>
+    
+    <div class="modal-footer" [@fadeInScale]>
+      <button type="button" class="btn btn-primary ripple" (click)="closeProfileModal()">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
