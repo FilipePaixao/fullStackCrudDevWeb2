@@ -10,7 +10,6 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Inicializar dependências
 const userRepository = new UserRepository();
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const getAllUsersUseCase = new GetAllUsersUseCase(userRepository);
@@ -26,7 +25,6 @@ const userController = new UserController(
   deleteUserUseCase
 );
 
-// Rotas protegidas com autenticação
 router.get('/users/me', authMiddleware, (req, res) => userController.getProfile(req, res));
 router.post('/users', authMiddleware, (req, res) => userController.create(req, res));
 router.get('/users', authMiddleware, (req, res) => userController.getAll(req, res));
