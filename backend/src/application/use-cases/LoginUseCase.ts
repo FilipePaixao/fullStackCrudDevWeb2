@@ -22,9 +22,13 @@ export class LoginUseCase {
       throw new Error('Email e senha são obrigatórios');
     }
 
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmailIncludingInactive(email);
     if (!user) {
       throw new Error('Credenciais inválidas');
+    }
+
+    if (!user.status) {
+      throw new Error('Usuário inativo');
     }
 
     if (!user.password) {

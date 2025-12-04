@@ -16,6 +16,9 @@ export class AuthController {
         id: user.id,
         name: user.name,
         email: user.email,
+        status: user.status,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       });
     } catch (error: any) {
       res.status(400).json({ error: error.message });

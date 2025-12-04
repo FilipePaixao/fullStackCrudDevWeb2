@@ -6,7 +6,6 @@ import { LoginUseCase } from '../../application/use-cases/LoginUseCase';
 
 const router = Router();
 
-// Inicializar dependências
 const userRepository = new UserRepository();
 const registerUseCase = new RegisterUseCase(userRepository);
 const loginUseCase = new LoginUseCase(userRepository);

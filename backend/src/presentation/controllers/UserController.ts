@@ -5,6 +5,18 @@ import { GetUserByIdUseCase } from '../../application/use-cases/GetUserByIdUseCa
 import { UpdateUserUseCase } from '../../application/use-cases/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../../application/use-cases/DeleteUserUseCase';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { User } from '../../domain/entities/User';
+
+function sanitizeUser(user: User) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    status: user.status,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
 
 export class UserController {
   constructor(
@@ -19,7 +31,7 @@ export class UserController {
     try {
       const { name, email } = req.body;
       const user = await this.createUserUseCase.execute(name, email);
-      res.status(201).json(user);
+      res.status(201).json(sanitizeUser(user));
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
@@ -28,7 +40,7 @@ export class UserController {
   async getAll(req: Request, res: Response): Promise<void> {
     try {
       const users = await this.getAllUsersUseCase.execute();
-      res.status(200).json(users);
+      res.status(200).json(users.map(user => sanitizeUser(user)));
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -38,7 +50,7 @@ export class UserController {
     try {
       const id = parseInt(req.params.id);
       const user = await this.getUserByIdUseCase.execute(id);
-      res.status(200).json(user);
+      res.status(200).json(sanitizeUser(user));
     } catch (error: any) {
       res.status(404).json({ error: error.message });
     }
@@ -49,7 +61,7 @@ export class UserController {
       const id = parseInt(req.params.id);
       const { name, email } = req.body;
       const user = await this.updateUserUseCase.execute(id, name, email);
-      res.status(200).json(user);
+      res.status(200).json(sanitizeUser(user));
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
@@ -72,7 +84,6 @@ export class UserController {
         return;
       }
       const user = await this.getUserByIdUseCase.execute(req.userId);
-      // Retornar apenas os dados necessários sem a senha
       res.status(200).json({
         id: user.id,
         name: user.name,

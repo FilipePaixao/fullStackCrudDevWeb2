@@ -15,6 +15,9 @@ export class UserEntity {
   @Column({ nullable: true })
   password?: string;
 
+  @Column({ default: true })
+  status!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 
@@ -27,6 +30,7 @@ export class UserEntity {
       this.name,
       this.email,
       this.password,
+      this.status,
       this.createdAt,
       this.updatedAt
     );
@@ -42,6 +46,7 @@ export class UserEntity {
     if (user.password) {
       entity.password = user.password;
     }
+    entity.status = user.status;
     if (user.createdAt) {
       entity.createdAt = user.createdAt;
     }

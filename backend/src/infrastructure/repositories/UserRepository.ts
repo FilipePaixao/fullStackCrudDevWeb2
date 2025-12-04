@@ -12,16 +12,21 @@ export class UserRepository implements IUserRepository {
   }
 
   async findAll(): Promise<User[]> {
-    const entities = await this.repository.find();
+    const entities = await this.repository.find({ where: { status: true } });
     return entities.map(entity => entity.toDomain());
   }
 
   async findById(id: number): Promise<User | null> {
-    const entity = await this.repository.findOne({ where: { id } });
+    const entity = await this.repository.findOne({ where: { id, status: true } });
     return entity ? entity.toDomain() : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
+    const entity = await this.repository.findOne({ where: { email, status: true } });
+    return entity ? entity.toDomain() : null;
+  }
+
+  async findByEmailIncludingInactive(email: string): Promise<User | null> {
     const entity = await this.repository.findOne({ where: { email } });
     return entity ? entity.toDomain() : null;
   }
@@ -46,7 +51,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async delete(id: number): Promise<void> {
-    await this.repository.delete(id);
+    await this.repository.update(id, { status: false });
   }
 }
 
